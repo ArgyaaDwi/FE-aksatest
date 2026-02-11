@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../features/auth/AuthContext";
 import FormField from "../components/form/FormField";
 import Button from "../components/form/Button";
+import { Eye, EyeOff } from "lucide-react";
 export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -12,21 +13,29 @@ export default function LoginPage() {
     password: "",
   });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     setError("");
 
-    const result = login(form);
+    const result = await login(form);
+    setLoading(false);
     if (result.success) {
       navigate("/", { replace: true });
     } else {
       setError(result.message);
     }
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -55,22 +64,35 @@ export default function LoginPage() {
               placeholder="Masukkan username Anda"
               required
             />
-            <FormField
-              label="Password"
-              name="password"
-              type="password"
-              value={form.password}
-              onChange={handleChange}
-              placeholder="Masukkan password Anda"
-              required
-            />
-            <Button type="submit" className="flex justify-center w-full">
-              Login
+            <div className="relative">
+              <FormField
+                label="Password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                value={form.password}
+                onChange={handleChange}
+                placeholder="Masukkan password Anda"
+                required
+              />
+              <button
+                type="button"
+                className="absolute text-gray-500 right-3 top-1/2 focus:outline-none"
+                onClick={togglePasswordVisibility}
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
+            <Button
+              type="submit"
+              className="flex justify-center w-full"
+              disabled={loading}
+            >
+              {loading ? "Bentar..." : "Login"}
             </Button>
           </form>
           <p className="mt-6 text-xs text-orange-600">ⓘ Credentials:</p>
           <p className="text-xs text-gray-400 ">username: admin</p>
-          <p className="text-xs text-gray-400">pass: admin123</p>
+          <p className="text-xs text-gray-400">pass: pastibisa</p>
         </div>
       </div>
       <div className="relative hidden w-1/2 md:block">

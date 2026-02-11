@@ -1,6 +1,3 @@
-/**
- * Filter data berdasarkan keyword
- */
 export function filterItems(items, keyword) {
   if (!keyword) return items;
 
@@ -11,10 +8,6 @@ export function filterItems(items, keyword) {
       item.email.toLowerCase().includes(lower)
   );
 }
-
-/**
- * Pagination manual
- */
 export function paginate(items, page, perPage) {
   const start = (page - 1) * perPage;
   const end = start + perPage;

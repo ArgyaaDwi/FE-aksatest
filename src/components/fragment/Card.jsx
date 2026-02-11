@@ -17,10 +17,10 @@ const Card = ({ icon, text, count, color, url, isDetail = true }) => {
         {isDetail && (
           <Link to={url} className="mt-2">
             <div className="flex items-center space-x-1">
-              <p className="text-sm font-normal text-blue-700 hover:underline">
+              <p className="text-sm font-normal text-blue-700 dark:text-blue-300 hover:underline">
                 More Info
               </p>
-              <ChevronRight size={15} className="text-blue-700" />
+              <ChevronRight size={15} className="text-blue-700 dark:text-blue-300" />
             </div>
           </Link>
         )}

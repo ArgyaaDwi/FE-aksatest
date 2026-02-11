@@ -85,7 +85,7 @@ export default function CrudIndexPage() {
         <div className="mb-4">
           <input
             type="text"
-            placeholder="Cari nama atau email..."
+            placeholder="Cari  berdasarkan nama atau email..."
             value={searchParam}
             onChange={handleSearchChange}
             className="w-full max-w-sm px-3 py-2 border rounded focus:outline-none focus:ring focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
@@ -96,24 +96,26 @@ export default function CrudIndexPage() {
           <table className="w-full text-sm border-collapse">
             <thead>
               <tr className="text-left border-b dark:border-gray-700">
-                <th className="p-3 whitespace-nowrap">Nama</th>{" "}
-                <th className="p-3 whitespace-nowrap">Email</th>
-                <th className="p-3 whitespace-nowrap">Aksi</th>
+                <th className="p-3 uppercase whitespace-nowrap">No</th>
+                <th className="p-3 uppercase whitespace-nowrap">Nama</th>
+                <th className="p-3 uppercase whitespace-nowrap">Email</th>
+                <th className="p-3 uppercase whitespace-nowrap">Aksi</th>
               </tr>
             </thead>
             <tbody>
               {paginatedItems.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="p-4 text-center text-gray-500">
+                  <td colSpan={4} className="p-4 text-center text-gray-500">
                     Data tidak ditemukan
                   </td>
                 </tr>
               ) : (
-                paginatedItems.map((item) => (
+                paginatedItems.map((item, index) => (
                   <tr
                     key={item.id}
                     className="border-b last:border-none dark:border-gray-700"
                   >
+                    <td className="p-3">{index + 1}</td>
                     <td className="p-3">{item.name}</td>
                     <td className="p-3">{item.email}</td>
                     <td className="flex items-center gap-4 p-3">

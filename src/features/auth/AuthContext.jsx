@@ -1,12 +1,13 @@
+import { updateProfileApi } from "../../api/auth.api";
 import { createContext, useContext, useEffect, useState } from "react";
-import { AUTH_CREDENTIAL } from "../../lib/credentials";
-import { storage } from "../../lib/storage";
+import { loginApi, logoutApi } from "../../api/auth.api";
 
 const AuthContext = createContext(null);
 
 const defaultAuthState = {
   isAuthenticated: false,
   user: null,
+  token: null,
 };
 
 export function AuthProvider({ children }) {
@@ -14,50 +15,70 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedAuth = storage.get();
-    if (savedAuth?.isAuthenticated) {
-      setAuth(savedAuth);
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
+
+    if (token && user) {
+      setAuth({
+        isAuthenticated: true,
+        token,
+        user: JSON.parse(user),
+      });
     }
+
     setLoading(false);
   }, []);
 
-  const login = ({ username, password }) => {
-    if (
-      username === AUTH_CREDENTIAL.username &&
-      password === AUTH_CREDENTIAL.password
-    ) {
-      const newAuth = {
+  const login = async ({ username, password }) => {
+    try {
+      const res = await loginApi({ username, password });
+
+      const { token, admin } = res.data;
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(admin));
+
+      setAuth({
         isAuthenticated: true,
-        user: {
-          name: "Admin Argya",
-        },
-      };
+        token,
+        user: admin,
+      });
 
-      setAuth(newAuth);
-      storage.set(newAuth);
       return { success: true };
-    }
-
-    return { success: false, message: "Username atau password salah" };
-  };
-
-  const logout = () => {
-    setAuth(defaultAuthState);
-    storage.clear();
-  };
-
-  const updateProfile = ({ name }) => {
-    setAuth((prev) => {
-      const updated = {
-        ...prev,
-        user: {
-          ...prev.user,
-          name,
-        },
+    } catch (err) {
+      return {
+        success: false,
+        message: err.response?.data?.message || "Login gagal",
       };
-      storage.set(updated);
-      return updated;
-    });
+    }
+  };
+
+  const logout = async () => {
+    try {
+      if (auth.token) {
+        await logoutApi(auth.token);
+      }
+    } catch (_) {}
+
+    localStorage.clear();
+    setAuth(defaultAuthState);
+  };
+  const updateProfile = async ({ name }) => {
+    const res = await updateProfileApi({ name });
+
+    const updatedUser = res.data.data.admin;
+
+    const newAuth = {
+      isAuthenticated: true,
+      token: auth.token,
+      user: updatedUser,
+    };
+
+    setAuth(newAuth);
+
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+
+    return { success: true };
   };
 
   return (

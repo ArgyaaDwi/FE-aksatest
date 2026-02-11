@@ -3,15 +3,23 @@ import { useState } from "react";
 import { useAuth } from "../features/auth/AuthContext";
 import Layout from "../components/layouts/Layout";
 import ModalSuccess from "../components/fragment/ModalSuccess";
+import Button from "../components/form/Button";
 export default function ProfilePage() {
+  const [loading, setLoading] = useState(false);
   const { user, updateProfile } = useAuth();
   const [name, setName] = useState(user?.name || "");
   const [success, setSuccess] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    updateProfile({ name });
-    setSuccess(true);
+    setLoading(true);
+
+    try {
+      await updateProfile({ name });
+      setSuccess(true);
+    } finally {
+      setLoading(false);
+    }
   };
   return (
     <Layout>
@@ -41,12 +49,9 @@ export default function ProfilePage() {
               required
             />
           </div>
-          <button
-            type="submit"
-            className="px-4 py-2 text-white transition rounded bg-secondary hover:bg-primary"
-          >
-            Simpan Perubahan
-          </button>
+          <Button type="submit" disabled={loading}>
+            {loading ? "Menyimpan..." : "Simpan Perubahan"}
+          </Button>
         </form>
       </div>
     </Layout>

@@ -6,6 +6,8 @@ import { createItem } from "./crud.service";
 import Button from "../../components/form/Button";
 import FormField from "../../components/form/FormField";
 export default function CrudCreatePage() {
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
   const [form, setForm] = useState({
     name: "",
@@ -16,12 +18,16 @@ export default function CrudCreatePage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    createItem(form);
-    navigate("/items", {
-      state: { success: true, message: "Data berhasil ditambahkan" },
-    });
+    setLoading(true);
+
+    try {
+      await createItem(form);
+      navigate("/items");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -52,7 +58,9 @@ export default function CrudCreatePage() {
             required
           />
           <div className="flex gap-2">
-            <Button type="submit">Simpan</Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? "Menyimpan..." : "Simpan"}
+            </Button>
             <Button variant="outline" onClick={() => navigate("/items")}>
               Batal
             </Button>
